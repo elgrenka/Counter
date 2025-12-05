@@ -5,17 +5,17 @@ using System;
 public class Counter : MonoBehaviour
 {
     public event Action<int> ValueChanged;
-    
+
     private int _currentValue;
     private bool _isCounting;
     private Coroutine _countingCoroutine;
 
     private InputReader _inputReader;
 
-    void Start()
+    private void Start()
     {
-        _inputReader = FindObjectOfType<InputReader>();
-        
+        _inputReader = FindAnyObjectByType<InputReader>();
+
         if (_inputReader != null)
         {
             _inputReader.MouseButtonPressed += OnMouseButtonPressed;
@@ -26,7 +26,7 @@ public class Counter : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         if (_inputReader != null)
         {
@@ -54,7 +54,7 @@ public class Counter : MonoBehaviour
     private IEnumerator Count()
     {
         var wait = new WaitForSeconds(0.5f);
-        while (true)
+        while (enabled)
         {
             _currentValue++;
             ValueChanged?.Invoke(_currentValue);

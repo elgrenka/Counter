@@ -6,14 +6,14 @@ public class CounterView : MonoBehaviour
     [SerializeField] private TMP_Text _text;
     private Counter _counter;
 
-    void Start()
+    private void Start()
     {
         _counter = FindAnyObjectByType<Counter>();
         _counter.ValueChanged += UpdateText;
         UpdateText(0);
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         if (_counter != null)
         {
