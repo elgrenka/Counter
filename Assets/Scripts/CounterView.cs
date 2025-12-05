@@ -4,11 +4,15 @@ using TMPro;
 public class CounterView : MonoBehaviour
 {
     [SerializeField] private TMP_Text _text;
-    private Counter _counter;
+    [SerializeField] private Counter _counter;
 
     private void Start()
     {
-        _counter = FindAnyObjectByType<Counter>();
+        if (_text == null || _counter == null)
+        {
+            Debug.LogError("Text или Counter не назначены в инспекторе.");
+        }
+
         _counter.ValueChanged += UpdateText;
         UpdateText(0);
     }
@@ -23,13 +27,6 @@ public class CounterView : MonoBehaviour
 
     private void UpdateText(int value)
     {
-        if (_text != null)
-        {
-            _text.text = $"{value}";
-        }
-        else
-        {
-            Debug.Log($"{value}");
-        }
+        _text.text = $"{value}";
     }
 }

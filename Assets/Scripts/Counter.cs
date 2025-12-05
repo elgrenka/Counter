@@ -6,24 +6,21 @@ public class Counter : MonoBehaviour
 {
     public event Action<int> ValueChanged;
 
+    [SerializeField] private InputReader _inputReader;
+
     private int _currentValue;
     private bool _isCounting;
     private Coroutine _countingCoroutine;
 
-    private InputReader _inputReader;
-
     private void Start()
     {
-        _inputReader = FindAnyObjectByType<InputReader>();
+        if (_inputReader == null)
+        {
+            Debug.LogError("InputReader не назначен в инспекторе.");
+            return;
+        }
 
-        if (_inputReader != null)
-        {
-            _inputReader.MouseButtonPressed += OnMouseButtonPressed;
-        }
-        else
-        {
-            Debug.LogError("InputReader не найден.");
-        }
+        _inputReader.MouseButtonPressed += OnMouseButtonPressed;
     }
 
     private void OnDestroy()
@@ -42,18 +39,16 @@ public class Counter : MonoBehaviour
         {
             _countingCoroutine = StartCoroutine(Count());
         }
-        else
+        else if (_countingCoroutine != null)
         {
-            if (_countingCoroutine != null)
-            {
-                StopCoroutine(_countingCoroutine);
-            }
+            StopCoroutine(_countingCoroutine);
         }
     }
 
     private IEnumerator Count()
     {
         var wait = new WaitForSeconds(0.5f);
+        
         while (enabled)
         {
             _currentValue++;
