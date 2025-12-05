@@ -1,61 +1,64 @@
-using UnityEngine;
 using System.Collections;
-using TMPro;
+using UnityEngine;
+using System;
 
 public class Counter : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI _text;
+    public event Action<int> ValueChanged;
     
-    private Coroutine _countCoroutine;
+    private int _currentValue;
     private bool _isCounting;
-    private int _currentCount;
+    private Coroutine _countingCoroutine;
 
-    private void Start()
+    private InputReader _inputReader;
+
+    void Start()
     {
-        _text.text = "0";
+        _inputReader = FindObjectOfType<InputReader>();
+        
+        if (_inputReader != null)
+        {
+            _inputReader.MouseButtonPressed += OnMouseButtonPressed;
+        }
+        else
+        {
+            Debug.LogError("InputReader не найден.");
+        }
     }
-    
-    private void Update()
+
+    void OnDestroy()
     {
-        if (Input.GetMouseButtonDown(0))
-            ToggleCount();
+        if (_inputReader != null)
+        {
+            _inputReader.MouseButtonPressed -= OnMouseButtonPressed;
+        }
     }
-    
-    private void ToggleCount()
+
+    private void OnMouseButtonPressed()
     {
         _isCounting = !_isCounting;
 
         if (_isCounting)
         {
-            _countCoroutine = StartCoroutine(Countdown(0.5f));
+            _countingCoroutine = StartCoroutine(Count());
         }
         else
         {
-            if (_countCoroutine != null)
+            if (_countingCoroutine != null)
             {
-                StopCoroutine(_countCoroutine);
-            
-                _countCoroutine = null;
+                StopCoroutine(_countingCoroutine);
             }
         }
     }
-    
-    private IEnumerator Countdown(float delay)
-    {
-        var wait = new WaitForSeconds(delay);
 
-        while (_isCounting)
+    private IEnumerator Count()
+    {
+        var wait = new WaitForSeconds(0.5f);
+        while (true)
         {
-            DisplayCountdown(_currentCount);
-            
+            _currentValue++;
+            ValueChanged?.Invoke(_currentValue);
             yield return wait;
-            
-            _currentCount++;
         }
-    }
-
-    private void DisplayCountdown(int count)
-    {
-        _text.text = count.ToString("");
     }
 }
